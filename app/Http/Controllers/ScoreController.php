@@ -14,14 +14,19 @@ class ScoreController extends Controller
     {
 
     }
-    public function get($hash)
+    public function get($hash, $uid)
     {
         try{
             $dt = Carbon::now()->format('Y-m-d H:i:s');
-            $scores = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise')
+            $scores = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise','created_at')
             ->where('hash','=',$hash)
-            ->orderBy('sco','desc')->get();
+            ->orderBy('sco','desc')->limit(100)->get();
 
+            $myscore = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise','created_at')
+            ->where('hash','=',$hash)
+            ->where('uid','=',$uid)
+            ->first();
+            
             foreach ($scores as $score) {
                 $user = User::select('id','name')
                 ->where('id','=',$score->uid )->first();
@@ -32,7 +37,7 @@ class ScoreController extends Controller
             }
             unset($score);
             return response()->json([
-               'date' => $dt,
+               'myscore' => $myscore,
                 'score' => $scores->toArray(),
                 'result' => 'retrieved'
             ]);
