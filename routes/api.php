@@ -20,4 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('print/{name}', 'TestController@print');
 
 Route::get('score/get/{hash}', 'ScoreController@get');
-Route::get('score/add/{hash}/uid/{uid}/sco/{sco}/kk/{kk}/cc/{cc}/gg/{gg}/bb/{bb}/mm/{mm}/maxcombo/{maxcombo}', 'ScoreController@add');
+Route::get('score/add/{hash}/uid/{uid}/sco/{sco}/kk/{kk}/cc/{cc}/gg/{gg}/bb/{bb}/mm/{mm}/maxcombo/{maxcombo}/bitwise/{bitwise}', 'ScoreController@add');

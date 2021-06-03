@@ -18,6 +18,7 @@ class Score extends Model
         'bb',
         'mm',       
         'maxcombo',
+        'bitwise',
     ];
 
     protected $dates =[

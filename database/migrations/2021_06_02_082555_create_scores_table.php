@@ -24,6 +24,7 @@ class CreateScoresTable extends Migration
             $table->integer('bb');
             $table->integer('mm');
             $table->integer('maxcombo');
+            $table->integer('bitwise');
             $table->timestamps();
         });
     }

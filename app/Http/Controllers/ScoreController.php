@@ -18,7 +18,7 @@ class ScoreController extends Controller
     {
         try{
             $dt = Carbon::now()->format('Y-m-d H:i:s');
-            $scores = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo')
+            $scores = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise')
             ->where('hash','=',$hash)
             ->orderBy('sco','desc')->get();
 
@@ -42,12 +42,12 @@ class ScoreController extends Controller
 
             return response()->json([
                 'date' => $dt,
-                'message' => 'Score Registering',
+                'message' => 'Getting Score',
                 'result' => 'Failed'
             ], 422);
         }
     }
-    public function add($hash, $uid, $sco, $kk, $cc, $gg, $bb, $mm, $maxcombo)
+    public function add($hash, $uid, $sco, $kk, $cc, $gg, $bb, $mm, $maxcombo, $bitwise)
     {
         $dt = Carbon::now()->format('Y-m-d H:i:s');
         try{
@@ -66,12 +66,14 @@ class ScoreController extends Controller
             ]);
   
             */
-            $score = DB::table('scores')
-            ->where('uid' ,'=', $uid)
-            ->where('hash','=',$hash)->delete();
-            
             //$score1 = clone $score;
             //$score1->where('sco','>',$sco)->first();
+            $score = DB::table('scores')
+            ->where('uid' ,'=', $uid)
+            ->where('hash','=',$hash)
+            ->where('sco','<=',$sco)->delete();
+            
+
 
             $score1 = DB::table('scores')
             ->where('uid' ,'=', $uid)
@@ -89,6 +91,7 @@ class ScoreController extends Controller
                 'bb'=>$bb,
                 'mm'=>$mm,
                 'maxcombo'=>$maxcombo,
+                'bitwise'=>$bitwise,
                 'created_at' => $dt, 
                 'updated_at' => $dt
             ]);
