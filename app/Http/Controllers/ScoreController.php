@@ -24,9 +24,15 @@ class ScoreController extends Controller
 
             $myscore = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise','created_at')
             ->where('hash','=',$hash)
-            ->where('uid','=',$uid)
-            ->first();
-            
+            ->where('uid','=',$uid)->first();
+
+            $collection = collect(
+                Score::where('hash',$hash)
+                ->orderBy('sco', 'DESC')
+                ->get());
+            $data       = $collection->where('uid', $uid);
+            $value      = $data->keys()->first() + 1;
+           
             foreach ($scores as $score) {
                 $user = User::select('id','name')
                 ->where('id','=',$score->uid )->first();
@@ -38,8 +44,9 @@ class ScoreController extends Controller
             unset($score);
             return response()->json([
                'myscore' => $myscore,
-                'score' => $scores->toArray(),
-                'result' => 'retrieved'
+               'result' => 'retrieved',
+               'score' => $scores->toArray(),
+               'ranking'=> $value
             ]);
         }
         catch (\Thorowable $th){
@@ -47,8 +54,8 @@ class ScoreController extends Controller
 
             return response()->json([
                 'date' => $dt,
-                'message' => 'Getting Score',
-                'result' => 'Failed'
+                'result' => 'Failed',
+                'message' => 'Getting Score'
             ], 422);
         }
     }
@@ -78,8 +85,6 @@ class ScoreController extends Controller
             ->where('hash','=',$hash)
             ->where('sco','<=',$sco)->delete();
             
-
-
             $score1 = DB::table('scores')
             ->where('uid' ,'=', $uid)
             ->where('hash','=',$hash)
@@ -104,8 +109,8 @@ class ScoreController extends Controller
 
             return response()->json([
                 'date' => $dt,
-                'message' => 'Score Registering',
-                'result' => 'Submit'
+                'result' => 'Submit',
+                'message' => 'Score Registering'
             ], 200);
         }
         catch (\Thorowable $th){
@@ -113,8 +118,8 @@ class ScoreController extends Controller
 
             return response()->json([
                 'date' => $dt,
-                'message' => 'Score Registering',
-                'result' => 'Failed'
+                'result' => 'Failed',
+                'message' => 'Score Registering'
             ], 422);
         }
     }
