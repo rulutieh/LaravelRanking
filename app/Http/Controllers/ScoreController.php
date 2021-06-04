@@ -32,13 +32,16 @@ class ScoreController extends Controller
                 ->get());
             $data       = $collection->where('uid', $uid);
             $value      = $data->keys()->first() + 1;
-
-            $myrank = User::select('id','name')
-            ->where('id','=', $myscore->uid)->first();
-            if (!empty($myrank))
-            {
-                $myscore->uid =  $myrank->value('name');
+            
+            if ($myscore){
+                $myrank = User::select('id','name')
+                ->where('id','=', $myscore->uid)->first();
+                if (!empty($myrank))
+                {
+                    $myscore->uid =  $myrank->value('name');
+                }
             }
+            
 
             foreach ($scores as $score) {
                 $user = User::select('id','name')
