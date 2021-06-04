@@ -32,7 +32,14 @@ class ScoreController extends Controller
                 ->get());
             $data       = $collection->where('uid', $uid);
             $value      = $data->keys()->first() + 1;
-           
+
+            $myrank = User::select('id','name')
+            ->where('id','=', $myscore->uid)->first();
+            if (!empty($myrank))
+            {
+                $myscore->uid =  $myrank->value('name');
+            }
+
             foreach ($scores as $score) {
                 $user = User::select('id','name')
                 ->where('id','=',$score->uid )->first();
@@ -42,6 +49,8 @@ class ScoreController extends Controller
                 }
             }
             unset($score);
+
+
             return response()->json([
                'myscore' => $myscore,
                'result' => 'retrieved',
@@ -76,21 +85,29 @@ class ScoreController extends Controller
                 'created_at' => $dt, 
                 'updated_at' => $dt
             ]);
-  
             */
-            //$score1 = clone $score;
-            //$score1->where('sco','>',$sco)->first();
-            $score = DB::table('scores')
-            ->where('uid' ,'=', $uid)
-            ->where('hash','=',$hash)
-            ->where('sco','<=',$sco)->delete();
-            
-            $score1 = DB::table('scores')
-            ->where('uid' ,'=', $uid)
-            ->where('hash','=',$hash)
-            ->where('sco','>',$sco)->first();
 
-            if (!$score1){
+            $score = Score::where('uid' ,'=', $uid)
+            ->where('hash','=',$hash)->get();
+
+            $scoretomodify = $score->where('sco','<=',$sco)
+            ->first();
+
+            if ($scoretomodify)
+            $scoretomodify
+            ->update([
+                'sco'=>$sco,
+                'kk'=>$kk,
+                'cc'=>$cc,
+                'gg'=>$gg,
+                'bb'=>$bb,
+                'mm'=>$mm,
+                'maxcombo'=>$maxcombo,
+                'bitwise'=>$bitwise,
+                'updated_at' => $dt
+            ]);
+
+            if (!$score->first()){
             $newscore = Score::create([
                 'hash'=>$hash,
                 'uid'=>$uid,
@@ -106,6 +123,8 @@ class ScoreController extends Controller
                 'updated_at' => $dt
             ]);
             }
+            
+            
 
             return response()->json([
                 'date' => $dt,
