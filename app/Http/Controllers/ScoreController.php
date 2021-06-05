@@ -18,47 +18,29 @@ class ScoreController extends Controller
     {
         try{
             $dt = Carbon::now()->format('Y-m-d H:i:s');
-            $scores = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise','created_at')
-            ->where('hash','=',$hash)
-            ->orderBy('sco','desc')->limit(100)->get();
-
-            $myscore = Score::select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise','created_at')
-            ->where('hash','=',$hash)
-            ->where('uid','=',$uid)->first();
 
             $collection = collect(
-                Score::where('hash',$hash)
+                Score::where('hash', $hash)
+                ->select('hash','uid','sco','kk','cc','gg','bb','mm','maxcombo','bitwise','updated_at')
                 ->orderBy('sco', 'DESC')->orderBy('updated_at', 'ASC')
                 ->get());
             $data       = $collection->where('uid', $uid);
-            $value      = $data->keys()->first() + 1;
-            
-            if ($myscore){
-                $myrank = User::select('id','name')
-                ->where('id','=', $myscore->uid)->first();
-                if (!empty($myrank))
-                {
-                    $myscore->uid =  $myrank->value('name');
-                }
-            }
-            
-
-            foreach ($scores as $score) {
-                $user = User::select('id','name')
-                ->where('id','=',$score->uid )->first();
+            $myrank      = $data->keys()->first() + 1;
+            $myscore     = $data->first();            
+            $ranking    = $collection->slice(0,50)->ToArray();
+            $users = DB::table('users')->get();
+            foreach ($ranking as $i => $rank) {
+                $user = $users->where('id', $rank['uid'] )->first();
                 if (!empty($user))
-                {
-                    $score->uid = $user->value('name');
+                {   
+                    $ranking[$i]['uid'] = $user->name;
                 }
             }
-            unset($score);
-
-
             return response()->json([
                'myscore' => $myscore,
                'result' => 'retrieved',
-               'score' => $scores->toArray(),
-               'ranking'=> $value
+               'score' => $ranking,
+               'ranking'=> $myrank
             ]);
         }
         catch (\Thorowable $th){
