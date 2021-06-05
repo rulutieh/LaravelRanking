@@ -28,7 +28,7 @@ class ScoreController extends Controller
 
             $collection = collect(
                 Score::where('hash',$hash)
-                ->orderBy('sco', 'DESC')
+                ->orderBy('sco', 'DESC')->orderBy('updated_at', 'ASC')
                 ->get());
             $data       = $collection->where('uid', $uid);
             $value      = $data->keys()->first() + 1;
@@ -93,7 +93,7 @@ class ScoreController extends Controller
             $score = Score::where('uid' ,'=', $uid)
             ->where('hash','=',$hash)->get();
 
-            $scoretomodify = $score->where('sco','<=',$sco)
+            $scoretomodify = $score->where('sco','<',$sco)
             ->first();
 
             if ($scoretomodify)
